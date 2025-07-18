@@ -4,11 +4,12 @@
     <meta charset='utf-8'>
     <title>NewsAgg Blog View</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; }
-        header { text-align: center; }
-        article { border-bottom: 1px solid #ccc; padding: 1em 0; }
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; background: #f9f9f9; }
+        header { text-align: center; margin: 2em 0; }
+        article { background: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 1em; margin-bottom: 1.5em; }
         h2 { margin-bottom: 0.2em; }
-        .source { color: #555; font-size: 0.9em; }
+        .source { color: #555; font-size: 0.9em; margin-bottom: 0.5em; }
+        .preview { margin-top: 0.5em; }
     </style>
 </head>
 <body>
@@ -19,6 +20,9 @@
     <article>
         <h2><a href="{{ item['link'] }}">{{ item['title'] }}</a></h2>
         <div class="source">{{ item['source'] }}</div>
+        {% if item['preview'] %}
+        <p class="preview">{{ item['preview'] }}</p>
+        {% endif %}
     </article>
     {% endfor %}
 </body>

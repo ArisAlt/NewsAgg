@@ -8,6 +8,7 @@ from . import (
     __version__,
     PACKAGE_PATH,
     AGGREGATOR_PATH,
+    AGGREGATOR_VERSION,
     BLOG_TEMPLATE_PATH,
     aggregate,
 )
@@ -23,7 +24,8 @@ def main() -> None:
         action="version",
         version=(
             f"NewsAgg {__version__} "
-            f"(package: {PACKAGE_PATH}, aggregator: {AGGREGATOR_PATH}, "
+            f"(package: {PACKAGE_PATH}, "
+            f"aggregator: {AGGREGATOR_PATH} v{AGGREGATOR_VERSION}, "
             f"template: {BLOG_TEMPLATE_PATH})"
         ),
     )
@@ -32,6 +34,8 @@ def main() -> None:
     news = aggregate(args.top)
     for idx, item in enumerate(news, start=1):
         print(f"{idx}. [{item['source']}] {item['title']} - {item['link']}")
+        if item.get("preview"):
+            print(f"    {item['preview']}")
 
 
 if __name__ == "__main__":
