@@ -6,10 +6,13 @@ command line or through a lightweight web application.
 
 ## Usage
 
-Run the tool using the provided script:
+Run the tool using the provided script or directly as a module:
 
 ```bash
 python main.py
+
+# or simply
+python -m newsagg -n 5
 ```
 
 You can also invoke the CLI module directly and specify the number of
@@ -20,7 +23,10 @@ python -m newsagg.cli -n 5 --version
 ```
 
 The package lives in the `newsagg/` directory and is currently at
-version `0.2.0`.
+version `0.3.0`.
+Running with `--version` will also print the path to the main
+aggregator file. The core scraping logic resides in
+`newsagg/aggregator.py`.
 
 ## Web Application
 

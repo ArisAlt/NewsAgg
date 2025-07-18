@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import re
 from typing import List, Dict, Tuple
 from urllib.parse import urljoin
@@ -86,6 +87,8 @@ SOURCES = [
 
 
 from . import __version__
+
+FILE_PATH = os.path.abspath(__file__)
 
 _SESSION = requests.Session()
 _SESSION.headers.update({"User-Agent": f"NewsAgg/{__version__}"})
