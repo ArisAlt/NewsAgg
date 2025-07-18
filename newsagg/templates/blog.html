@@ -1,25 +1,64 @@
 <!doctype html>
+<!-- Blog Template version 1.0 | Design inspired by Riverside.fm -->
 <html>
 <head>
     <meta charset='utf-8'>
     <title>NewsAgg Blog View</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; background: #f9f9f9; }
-        header { text-align: center; margin: 2em 0; }
-        article { background: #fff; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 1em; margin-bottom: 1.5em; }
-        h2 { margin-bottom: 0.2em; }
-        .source { color: #555; font-size: 0.9em; margin-bottom: 0.5em; }
-        .preview { margin-top: 0.5em; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            background: #f9f9f9;
+            color: #333;
+        }
+        header {
+            text-align: center;
+            margin: 2em 0;
+        }
+        header p {
+            color: #666;
+        }
+        article {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1em;
+            margin-bottom: 1.5em;
+        }
+        h2 {
+            margin-bottom: 0.2em;
+        }
+        .source {
+            color: #555;
+            font-size: 0.9em;
+            margin-bottom: 0.5em;
+        }
+        .preview {
+            margin-top: 0.5em;
+        }
+        .thumb {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 0.5em;
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>Aggregated News</h1>
+        <p>A sample blog layout taking cues from Riverside.fm's clean and photo-forward design.</p>
     </header>
     {% for item in news %}
     <article>
         <h2><a href="{{ item['link'] }}">{{ item['title'] }}</a></h2>
         <div class="source">{{ item['source'] }}</div>
+        {% if item['image'] %}
+        <img src="{{ item['image'] }}" alt="{{ item['title'] }}" class="thumb"/>
+        {% endif %}
         {% if item['preview'] %}
         <p class="preview">{{ item['preview'] }}</p>
         {% endif %}

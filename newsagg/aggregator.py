@@ -1,7 +1,8 @@
 """Core aggregation logic for NewsAgg.
 
-This module fetches headlines from various Greek news outlets and now also
-retrieves a short text preview for each entry.
+This module fetches headlines from various Greek news outlets using RSS feeds
+and HTML scraping. Each entry includes a short text preview and the URL of its
+main image when available.
 """
 
 from __future__ import annotations
@@ -105,6 +106,24 @@ def extract_preview(url: str) -> str:
         return ""
 
 
+def extract_image(url: str) -> str:
+    """Return the URL of the main image for an article."""
+    try:
+        resp = _SESSION.get(url, timeout=5)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        meta = soup.find("meta", property="og:image")
+        if meta and meta.get("content"):
+            img_url = meta["content"]
+        else:
+            img = soup.find("img")
+            img_url = img.get("src") if img and img.get("src") else ""
+        return img_url
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.debug("Image error %s: %s", url, exc)
+        return ""
+
+
 def get_max_pages_from_soup(soup: BeautifulSoup) -> int:
     """Detect the maximum page number from pagination links."""
     pages = []
@@ -127,7 +146,8 @@ def _parse_page(url: str, selector: str) -> Tuple[List[Dict[str, str]], Beautifu
         if title and href:
             link = urljoin(url, href)
             preview = extract_preview(link)
-            items.append({"title": title, "link": link, "preview": preview})
+            image = extract_image(link)
+            items.append({"title": title, "link": link, "preview": preview, "image": image})
     return items, soup
 
 
@@ -182,7 +202,8 @@ def fetch_json_html_list(source: Dict[str, str], top_n: int | None = None) -> Li
         if title and href:
             link = urljoin(source["url"], href)
             preview = extract_preview(link)
-            items.append({"title": title, "link": link, "preview": preview})
+            image = extract_image(link)
+            items.append({"title": title, "link": link, "preview": preview, "image": image})
     return items[:top_n] if top_n else items
 
 
@@ -204,7 +225,8 @@ def aggregate(top_n: int = 10) -> List[Dict[str, str]]:
                         preview = BeautifulSoup(preview, "html.parser").get_text(strip=True)[:200]
                     else:
                         preview = extract_preview(e.link)
-                    items.append({"title": e.title, "link": e.link, "preview": preview})
+                    image = extract_image(e.link)
+                    items.append({"title": e.title, "link": e.link, "preview": preview, "image": image})
             else:
                 logger.warning("Unknown parser for %s", source["name"])
                 continue
@@ -214,6 +236,7 @@ def aggregate(top_n: int = 10) -> List[Dict[str, str]]:
                     "title": item["title"],
                     "link": item["link"],
                     "preview": item.get("preview", ""),
+                    "image": item.get("image", ""),
                 })
         except Exception as exc:  # pylint: disable=broad-except
             logger.error("Error fetching %s: %s", source["name"], exc)
