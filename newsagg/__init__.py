@@ -2,7 +2,7 @@
 
 import os
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 from .aggregator import aggregate
