@@ -4,7 +4,13 @@ from __future__ import annotations
 
 import argparse
 
-from . import __version__, PACKAGE_PATH, AGGREGATOR_PATH, aggregate
+from . import (
+    __version__,
+    PACKAGE_PATH,
+    AGGREGATOR_PATH,
+    BLOG_TEMPLATE_PATH,
+    aggregate,
+)
 
 
 def main() -> None:
@@ -17,7 +23,8 @@ def main() -> None:
         action="version",
         version=(
             f"NewsAgg {__version__} "
-            f"(package: {PACKAGE_PATH}, aggregator: {AGGREGATOR_PATH})"
+            f"(package: {PACKAGE_PATH}, aggregator: {AGGREGATOR_PATH}, "
+            f"template: {BLOG_TEMPLATE_PATH})"
         ),
     )
     args = parser.parse_args()

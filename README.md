@@ -23,10 +23,10 @@ python -m newsagg.cli -n 5 --version
 ```
 
 The package lives in the `newsagg/` directory and is currently at
-version `0.4.0`.
-Running with `--version` will also print the path to the main
-aggregator file. The core scraping logic resides in
-`newsagg/aggregator.py`.
+version `0.5.0`.
+Running with `--version` will also print the paths to the main
+aggregator file and the blog template used by the web server. The core
+scraping logic resides in `newsagg/aggregator.py`.
 
 ## Web Application
 
@@ -38,5 +38,6 @@ python -m newsagg.webapp
 
 Navigate to `http://localhost:5000/` to see the results. You can supply
 the query parameter `n` to control how many items per source are
-displayed.
-The server implementation can be found in `newsagg/webapp.py`.
+displayed. The page now uses a blog-style template located at
+`newsagg/templates/blog.html` for a cleaner, dynamic view of the
+headlines. The server implementation can be found in `newsagg/webapp.py`.
