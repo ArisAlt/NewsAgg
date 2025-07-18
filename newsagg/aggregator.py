@@ -85,8 +85,10 @@ SOURCES = [
 ]
 
 
+from . import __version__
+
 _SESSION = requests.Session()
-_SESSION.headers.update({"User-Agent": "NewsAgg/0.1"})
+_SESSION.headers.update({"User-Agent": f"NewsAgg/{__version__}"})
 
 
 def get_max_pages_from_soup(soup: BeautifulSoup) -> int:
