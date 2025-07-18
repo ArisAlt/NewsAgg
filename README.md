@@ -23,7 +23,7 @@ python -m newsagg.cli -n 5 --version
 ```
 
 The package lives in the `newsagg/` directory and is currently at
-version `0.3.0`.
+version `0.4.0`.
 Running with `--version` will also print the path to the main
 aggregator file. The core scraping logic resides in
 `newsagg/aggregator.py`.
