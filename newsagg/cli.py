@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 
-from . import __version__, PACKAGE_PATH, aggregate
+from . import __version__, PACKAGE_PATH, AGGREGATOR_PATH, aggregate
 
 
 def main() -> None:
@@ -15,7 +15,10 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version=f"NewsAgg {__version__} ({PACKAGE_PATH})",
+        version=(
+            f"NewsAgg {__version__} "
+            f"(package: {PACKAGE_PATH}, aggregator: {AGGREGATOR_PATH})"
+        ),
     )
     args = parser.parse_args()
 
