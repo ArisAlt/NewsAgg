@@ -1,4 +1,8 @@
-"""Core aggregation logic for NewsAgg."""
+"""Core aggregation logic for NewsAgg.
+
+This module fetches headlines from various Greek news outlets and now also
+retrieves a short text preview for each entry.
+"""
 
 from __future__ import annotations
 
@@ -77,9 +81,28 @@ SOURCES = [
 from . import __version__
 
 FILE_PATH = os.path.abspath(__file__)
+FILE_VERSION = __version__
 
 _SESSION = requests.Session()
 _SESSION.headers.update({"User-Agent": f"NewsAgg/{__version__}"})
+
+
+def extract_preview(url: str) -> str:
+    """Return a short text preview for an article."""
+    try:
+        resp = _SESSION.get(url, timeout=5)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        meta = soup.find("meta", attrs={"name": "description"})
+        if meta and meta.get("content"):
+            text = meta["content"]
+        else:
+            para = soup.find("p")
+            text = para.get_text(strip=True) if para else ""
+        return text[:200]
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.debug("Preview error %s: %s", url, exc)
+        return ""
 
 
 def get_max_pages_from_soup(soup: BeautifulSoup) -> int:
@@ -103,7 +126,8 @@ def _parse_page(url: str, selector: str) -> Tuple[List[Dict[str, str]], Beautifu
         href = a.get("href")
         if title and href:
             link = urljoin(url, href)
-            items.append({"title": title, "link": link})
+            preview = extract_preview(link)
+            items.append({"title": title, "link": link, "preview": preview})
     return items, soup
 
 
@@ -157,7 +181,8 @@ def fetch_json_html_list(source: Dict[str, str], top_n: int | None = None) -> Li
         href = a.get("href")
         if title and href:
             link = urljoin(source["url"], href)
-            items.append({"title": title, "link": link})
+            preview = extract_preview(link)
+            items.append({"title": title, "link": link, "preview": preview})
     return items[:top_n] if top_n else items
 
 
@@ -172,9 +197,14 @@ def aggregate(top_n: int = 10) -> List[Dict[str, str]]:
                 items = fetch_json_html_list(source, top_n)
             elif source["parser"] == "rss":
                 feed = feedparser.parse(source["url"])
-                items = [
-                    {"title": e.title, "link": e.link} for e in feed.entries[:top_n]
-                ]
+                items = []
+                for e in feed.entries[:top_n]:
+                    preview = getattr(e, "summary", None) or getattr(e, "description", "")
+                    if preview:
+                        preview = BeautifulSoup(preview, "html.parser").get_text(strip=True)[:200]
+                    else:
+                        preview = extract_preview(e.link)
+                    items.append({"title": e.title, "link": e.link, "preview": preview})
             else:
                 logger.warning("Unknown parser for %s", source["name"])
                 continue
@@ -183,6 +213,7 @@ def aggregate(top_n: int = 10) -> List[Dict[str, str]]:
                     "source": source["name"],
                     "title": item["title"],
                     "link": item["link"],
+                    "preview": item.get("preview", ""),
                 })
         except Exception as exc:  # pylint: disable=broad-except
             logger.error("Error fetching %s: %s", source["name"], exc)
