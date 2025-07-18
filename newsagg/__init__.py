@@ -2,11 +2,17 @@
 
 import os
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 PACKAGE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 BLOG_TEMPLATE_PATH = os.path.join(PACKAGE_PATH, "templates", "blog.html")
-BLOG_TEMPLATE_VERSION = "1.0"
+BLOG_TEMPLATE_VERSION = "2.0"
+
+CLI_PATH = os.path.join(PACKAGE_PATH, "cli.py")
+CLI_VERSION = __version__
+
+WEBAPP_PATH = os.path.join(PACKAGE_PATH, "webapp.py")
+WEBAPP_VERSION = __version__
 
 from .aggregator import (
     aggregate,
@@ -22,4 +28,8 @@ __all__ = [
     "AGGREGATOR_VERSION",
     "BLOG_TEMPLATE_PATH",
     "BLOG_TEMPLATE_VERSION",
+    "CLI_PATH",
+    "CLI_VERSION",
+    "WEBAPP_PATH",
+    "WEBAPP_VERSION",
 ]

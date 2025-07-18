@@ -2,7 +2,12 @@ from __future__ import annotations
 
 from flask import Flask, render_template, request
 
-from . import aggregate
+import os
+
+from . import __version__, aggregate
+
+FILE_PATH = os.path.abspath(__file__)
+FILE_VERSION = __version__
 
 app = Flask(__name__)
 

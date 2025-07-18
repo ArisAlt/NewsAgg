@@ -11,8 +11,17 @@ from . import (
     AGGREGATOR_VERSION,
     BLOG_TEMPLATE_PATH,
     BLOG_TEMPLATE_VERSION,
+    CLI_PATH,
+    CLI_VERSION,
+    WEBAPP_PATH,
+    WEBAPP_VERSION,
     aggregate,
 )
+
+import os
+
+FILE_PATH = os.path.abspath(__file__)
+FILE_VERSION = CLI_VERSION
 
 
 def main() -> None:
@@ -26,6 +35,8 @@ def main() -> None:
         version=(
             f"NewsAgg {__version__} "
             f"(package: {PACKAGE_PATH}, "
+            f"CLI: {CLI_PATH} v{CLI_VERSION}, "
+            f"webapp: {WEBAPP_PATH} v{WEBAPP_VERSION}, "
             f"aggregator: {AGGREGATOR_PATH} v{AGGREGATOR_VERSION}, "
             f"template: {BLOG_TEMPLATE_PATH} v{BLOG_TEMPLATE_VERSION})"
         ),
