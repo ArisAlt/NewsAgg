@@ -20,68 +20,56 @@ logger = logging.getLogger(__name__)
 SOURCES = [
     {
         "name": "Kathimerini",
-        "url": "https://www.kathimerini.gr/most-popular/",
-        "parser": "html",
-        "selector": "ul.most-popular-list li a",
-        "pagination_param": "?page={page}",
-        "max_pages": 3,
+        "url": "https://www.kathimerini.gr/infeeds/popular/popular_html.txt",
+        "parser": "json_html",
+        "selector": "ul.nx-dhmofilh__list li a",
+        "json_key": "popular",
     },
     {
         "name": "Proto Thema",
-        "url": "https://www.protothema.gr/most-read/",
-        "parser": "html",
-        "selector": "div.article-list article h2 a",
-        "pagination_selector": "a.next",
-        "max_pages": 5,
+        "url": "https://www.protothema.gr/rss/",
+        "parser": "rss",
     },
     {
         "name": "In.gr",
-        "url": "https://www.in.gr/most-viewed/",
-        "parser": "html",
-        "selector": "div.mostread-list li a",
-        "pagination_param": "?page={page}",
+        "url": "https://www.in.gr/feed",
+        "parser": "rss",
     },
     {
         "name": "News247",
-        "url": "https://www.news247.gr/most-popular/",
+        "url": "https://www.news247.gr",
         "parser": "html",
-        "selector": "div#most_popular ul li a",
+        "selector": "section.popular_articles_section article a",
     },
     {
         "name": "SKAI",
-        "url": "https://www.skai.gr/most-popular/",
-        "parser": "html",
-        "selector": "div.module-content li a",
+        "url": "https://www.skai.gr/feed.xml",
+        "parser": "rss",
     },
     {
         "name": "Naftemporiki",
-        "url": "https://www.naftemporiki.gr/most-popular/",
-        "parser": "html",
-        "selector": "div.popular-news li a",
+        "url": "https://www.naftemporiki.gr/feed/",
+        "parser": "rss",
     },
     {
         "name": "To Vima",
-        "url": "https://www.tovima.gr/most-read/",
-        "parser": "html",
-        "selector": "section.popular-posts a.post-title",
+        "url": "https://www.tovima.gr/feed",
+        "parser": "rss",
     },
     {
         "name": "Ethnos",
-        "url": "https://www.ethnos.gr/most-popular/",
-        "parser": "html",
-        "selector": "section.popular-news li a",
+        "url": "https://www.ethnos.gr/rss",
+        "parser": "rss",
     },
     {
         "name": "Zougla",
-        "url": "https://www.zougla.gr/most-popular/",
-        "parser": "html",
-        "selector": "ul.top10 li a",
+        "url": "https://www.zougla.gr/feed/",
+        "parser": "rss",
     },
     {
         "name": "NewsIT",
-        "url": "https://www.newsit.gr/most-popular/",
-        "parser": "html",
-        "selector": "div.view-most-popular .views-row a",
+        "url": "https://www.newsit.gr/feed/",
+        "parser": "rss",
     },
 ]
 
@@ -155,6 +143,24 @@ def fetch_html_list(source: Dict[str, str], top_n: int | None = None) -> List[Di
     return results[:top_n] if top_n else results
 
 
+def fetch_json_html_list(source: Dict[str, str], top_n: int | None = None) -> List[Dict[str, str]]:
+    """Fetch list of links from a JSON endpoint containing HTML."""
+    resp = _SESSION.get(source["url"])
+    resp.raise_for_status()
+    data = resp.json()
+    html = data.get(source.get("json_key", "html"), "")
+    soup = BeautifulSoup(html, "html.parser")
+    items = []
+    selector = source.get("selector", "li a")
+    for a in soup.select(selector):
+        title = a.get_text(strip=True)
+        href = a.get("href")
+        if title and href:
+            link = urljoin(source["url"], href)
+            items.append({"title": title, "link": link})
+    return items[:top_n] if top_n else items
+
+
 def aggregate(top_n: int = 10) -> List[Dict[str, str]]:
     """Aggregate most viewed news from configured sources."""
     aggregated: List[Dict[str, str]] = []
@@ -162,6 +168,8 @@ def aggregate(top_n: int = 10) -> List[Dict[str, str]]:
         try:
             if source["parser"] == "html":
                 items = fetch_html_list(source, top_n)
+            elif source["parser"] == "json_html":
+                items = fetch_json_html_list(source, top_n)
             elif source["parser"] == "rss":
                 feed = feedparser.parse(source["url"])
                 items = [
